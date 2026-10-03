@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { setApiKey } from '../lib/tmdb';
 
 interface Props {
@@ -6,9 +6,31 @@ interface Props {
 }
 
 export default function ApiSetup({ onSet }: Props) {
-  const [key, setKey] = useState('');
+  const [key, setKey] = useState('7b554d8a68292aa314b114288a166cb0');
   const [error, setError] = useState('');
   const [testing, setTesting] = useState(false);
+
+  // تخطي الشاشة تلقائياً بمجرد فتح أي مستخدم للموقع
+  useEffect(() => {
+    const initializeApi = async () => {
+      setTesting(true);
+      try {
+        const fixedKey = '7b554d8a68292aa314b114288a166cb0';
+        const res = await fetch(`https://api.themoviedb.org/3/configuration?api_key=${fixedKey}`);
+        if (!res.ok) throw new Error('Invalid API key');
+        
+        localStorage.setItem('tmdb_api_key', fixedKey);
+        setApiKey(fixedKey);
+        onSet(); // الدخول الفوري للموقع
+      } catch {
+        setError('Failed to connect to the movie database automatically.');
+      } finally {
+        setTesting(false);
+      }
+    };
+
+    initializeApi();
+  }, [onSet]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +49,19 @@ export default function ApiSetup({ onSet }: Props) {
       setTesting(false);
     }
   };
+
+  // يظهر هذا المؤشر البسيط للحظات أثناء عملية التحقق التلقائي والدخول
+  if (testing && !error) {
+    return (
+      <div style={{
+        minHeight: '100vh', background: '#070a11',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#f0b430', fontFamily: 'sans-serif', fontSize: 18, fontWeight: 600
+      }}>
+        🎬 Connecting to CineVault...
+      </div>
+    );
+  }
 
   return (
     <div style={{
