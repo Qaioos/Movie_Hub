@@ -1,0 +1,10 @@
+{
+  "description": "Discover and explore movies and actors with advanced filters, personalized watchlists, and rich details in a sleek, cinematic interface.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
